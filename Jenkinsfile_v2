@@ -10,7 +10,7 @@ pipeline {
     }
     agent{   // create a node under the name gcloud that running google/cloud-sdk:latest docker image 
         kubernetes {
-        label 'sample-app'
+        label 'sample-app2'
         yaml """
             apiVersion: v1
             kind: Pod
@@ -34,18 +34,18 @@ pipeline {
     stages {
         stage ('test') {
             steps {
-                sh 'mvn clean test -f ./BinaryCalculatorWebapp/pom.xml'
+                sh 'mvn clean test -f ./pom.xml'
             }
         }
         stage('build'){
             steps{
-                sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/ clean package'
+                sh 'mvn package -DskipTests -f ./ clean package'
             }
         }
         stage('containerize'){
             steps{
                 container('gcloud') {   // within the gcloud container
-                    dir('BinaryCalculatorWebapp'){
+                    dir(''){
                         // set the credential for gcloud within the container
                         sh 'gcloud auth activate-service-account --key-file $SERVICE_ACCOUNT'
                         sh 'gcloud config set project $PROJECT'
@@ -57,7 +57,7 @@ pipeline {
         stage('deployment'){
             steps{
                 container('gcloud') {
-                    dir('BinaryCalculatorWebapp'){
+                    dir(''){
                         // set the credential for gcloud and kubectl within the container
                         sh 'gcloud auth activate-service-account --key-file $SERVICE_ACCOUNT'
                         sh 'gcloud config set project $PROJECT'
@@ -81,7 +81,7 @@ pipeline {
         stage('service'){
             steps{
                 container('gcloud') {
-                    dir('BinaryCalculatorWebapp'){
+                    dir(''){
                         // set the credential for gcloud and kubectl within the container
                         sh 'gcloud auth activate-service-account --key-file $SERVICE_ACCOUNT'
                         sh 'gcloud config set project $PROJECT'
